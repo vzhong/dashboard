@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyC5gIyB7XBw3UYsU6EJI2MJAVs5IFnf6vY",
+        authDomain: "dashboard-ffc72.firebaseapp.com",
+        databaseURL: "https://dashboard-ffc72.firebaseio.com",
+        storageBucket: "dashboard-ffc72.appspot.com",
+        messagingSenderId: "1081800712753"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- DataTable -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+
+    <!-- Local -->
+    <script src="auth.js"></script>
+    <script src="experiments.js"></script>
+
+    <script>
+      $(document).ready(function(){
+        ensure_auth();
+        list_experiments();
+      })
+    </script>
+
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to Dashboard</h1>
+      <div id="detailed-container">
+        <table class="table" id="detailed">
+          <thead id="detailed-header"></thead>
+          <tbody id="detailed-body"></tbody>
+        </table>
+      </div>
+
+      <div id="experiments-container">
+        <h2>Experiments</h2>
+        <table class="table" id="experiments">
+          <thead id="experiments-header"></thead>
+          <tbody id="experiments-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
