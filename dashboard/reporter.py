@@ -31,7 +31,7 @@ if __name__ == '__main__':
     from dashboard import writer
     import time
     r = Reporter()
-    writers = [writer.ConsoleWriter(), writer.FileWriter('foo.jsonl')]
+    writers = [writer.ConsoleWriter()]
 
     for i in range(10):
         d = {'iteration': i, 'score': i * 2}

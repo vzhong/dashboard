@@ -1,6 +1,7 @@
 import os
 import ujson as json
 import pyrebase
+import tabulate
 
 
 class Writer:
@@ -10,16 +11,23 @@ class Writer:
 
 class ConsoleWriter(Writer):
     def __init__(self):
-        self.last_keys = None
+        self.header = None
+        self.cache = []
+        self.last = None
 
     def add(self, metrics):
         keys = sorted(list(metrics.keys()))
-        row_format = "{:>15}" * (len(keys))
-        if keys != self.last_keys:
-            self.last_keys = keys
-            print(row_format.format(*keys))
-        vals = [metrics[k] for k in keys]
-        print(row_format.format(*vals))
+        if keys != self.header:
+            self.header = keys
+        rows = []
+        self.cache.append(metrics)
+        for m in self.cache:
+            rows.append([m.get(k, None) for k in self.header])
+        s = tabulate.tabulate(rows, headers=self.header)
+        if self.last:
+            s = "\033[F"*len(self.last.splitlines()) + s
+        print(s)
+        self.last = s
 
 
 class FileWriter(Writer):
@@ -37,7 +45,7 @@ class FileWriter(Writer):
 
 class FirebaseWriter(Writer):
 
-    def __init__(self, name, api_key=None, auth_domain=None, database_url=None, storage_bucket=None):
+    def __init__(self, name, api_key=None, auth_domain=None, database_url=None, storage_bucket=None, delete_existing=False):
         fconfig = os.path.join(os.environ['HOME'], '.fb.config')
         config = {}
         if os.path.isfile(fconfig):
@@ -54,6 +62,11 @@ class FirebaseWriter(Writer):
         assert config, 'failed to load config! Pass in your config or make your config file at {}.'.format(fconfig)
         self.name = name
         self.fb = pyrebase.initialize_app(config)
+        if delete_existing:
+            self.delete()
+
+    def delete(self):
+        self.fb.database().child('experiments').child(self.name).remove()
 
     def add(self, metrics):
         self.fb.database().child('experiments').child(self.name).push(metrics)

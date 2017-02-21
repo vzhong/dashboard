@@ -1,0 +1,3 @@
+pyrebase
+ujson
+requests
