@@ -10,18 +10,22 @@ function make_header(header, labels) {
 function close_experiment() {
     var container = $('#detailed-container');
     container.html('');
-    container.append($('<table>')
-        .attr('id', 'detailed')
-        .addClass('table')
-        .append($('<thead>').attr('id', 'detailed-header'))
-        .append($('<tbody>').attr('id', 'detailed-body'))
-    );
+    container
+        .append($('<div>').attr('id', 'detailed-plot-control'))
+        .append($('<div>').attr('id', 'detailed-plot'))
+        .append($('<table>')
+            .attr('id', 'detailed')
+            .addClass('table')
+            .append($('<thead>').attr('id', 'detailed-header'))
+            .append($('<tbody>').attr('id', 'detailed-body'))
+        );
 }
 
 
-function plot() {
-    var xlabel = $('#detailed-plot-x').val();
-    var ylabel = $('#detailed-plot-y').val();
+function plot(name) {
+    console.log($('#detailed-plot-x'));
+    var xlabel = $('#detailed-plot-x').find(':selected').text();
+    var ylabel = $('#detailed-plot-y').find(':selected').text();
 
     var log = $('#detailed-plot').data('log');
     var xs = [];
@@ -47,6 +51,7 @@ function plot() {
     }
 
     var layout = {
+        title: 'Plot for ' + name,
         xaxis: {title: xlabel},
         showlegend: true,
     }
@@ -58,6 +63,54 @@ function plot() {
         Plotly.extendTraces(plot_div, trace);
         Plotly.redraw(plot_div);
     }
+}
+
+
+function get_choice_list(id, label, options, selected) {
+    var selection = $('<select>')
+        .attr('id', id + '-selected')
+        .addClass('form-control')
+    for (var i=0; i<options.length; i++) {
+        var o = $('<option>').text(options[i]);
+        if (i == selected) { o.attr('selected', 'selected'); }
+        selection.append(o);
+    }
+    var list = $('<div>')
+        .addClass('form-group')
+        .append($('<div>')
+            .attr('id', id)
+            .addClass('form-group')
+            .append($('<label>')
+                .addClass('for', id + '-selected')
+                .text(label)
+            )
+            .append(selection)
+        );
+    return list;
+}
+
+
+function get_detailed_plot_control(name, log) {
+    $('#detailed-plot-control')
+        .append($('<h2>').text('Experiment ' + name))
+        .append($('<form>')
+            .addClass('form-inline')
+            .append(get_choice_list('detailed-plot-x', 'X axis:', log.header, 0))
+            .append(get_choice_list('detailed-plot-y', 'Y axis:', log.header, 1))
+            .append($('<button>')
+                .addClass('btn')
+                .addClass('btn-primary')
+                .text('Plot')
+                .attr('onclick', 'plot("' + name + '")')
+            )
+            .append($('<button>')
+                .addClass('btn')
+                .addClass('btn-danger')
+                .text('Close')
+                .attr('onclick', 'close_experiment()')
+            )
+        )
+        .append($('<div>').attr('id', 'detailed-plot').data('log', log))
 }
 
 
@@ -91,28 +144,6 @@ function show_experiment(name) {
     var table = $('#detailed');
     var header = $('#detailed-header');
     var body = $('#detailed-body');
-    $('#detailed-container')
-        .prepend($('<input>')
-            .attr('id', 'detailed-plot-y')
-            .attr('placeholder', 'Y'))
-            .attr('value', 'score')
-        .prepend($('<input>')
-            .attr('id', 'detailed-plot-x')
-            .attr('placeholder', 'X'))
-            .attr('value', 'iteration')
-        .prepend($('<button>')
-            .addClass('btn')
-            .addClass('btn-primary')
-            .text('Plot')
-            .attr('onclick', 'plot()')
-        )
-        .prepend($('<button>')
-            .addClass('btn')
-            .addClass('btn-danger')
-            .text('Close')
-            .attr('onclick', 'close_experiment()')
-        )
-        .prepend($('<h2>').text('Experiment ' + name));
 
     firebase.database().ref('experiments/' + name).once('value').then(function(s) {
         var log = order_log(s.val());
@@ -121,7 +152,7 @@ function show_experiment(name) {
             body.append(make_row(log.rows[i], log.header));
         }
         table.DataTable();
-        $('#detailed-container').append($('<div>').attr('id', 'detailed-plot').data('log', log));
+        get_detailed_plot_control(name, log);
     });
 }
 
@@ -131,23 +162,40 @@ function add_experiment_to_list(table, name, size) {
         .append($('<td>').text(name))
         .append($('<td>').text(size))
         .append($('<td>')
-            .append($('<a>')
+            .append($('<button>')
+                .addClass('btn')
+                .addClass('btn-primary')
                 .attr('onclick', 'show_experiment("' + name + '")')
                 .attr('href', '#')
-                .text('show')
+                .text('Show')
+            )
+            .append($('<button>')
+                .addClass('btn')
+                .addClass('btn-danger')
+                .attr('onclick', 'delete_experiment("' + name + '")')
+                .attr('href', '#')
+                .text('Delete')
             )
         )
-    )
+    );
+}
+
+
+function delete_experiment(name) {
+    firebase.database().ref('experiments/' + name).remove();
+    list_experiments();
 }
 
 
 function list_experiments() {
+    $('#experiments-header').html('');
+    $('#experiments-body').html('');
+
     firebase.database().ref('experiments').once('value').then(function(s) {
-        $('#experiments-container').prepend($('<h2>').text('Experiments'))
         var table = $('#experiments');
         var header = $('#experiments-header');
         var body = $('#experiments-body');
-        make_header(header, ['Name', '# Entries', 'Open']);
+        make_header(header, ['Name', '# Entries', 'Options']);
         var experiments = s.val();
         for (var name in experiments) {
             add_experiment_to_list(body, name, Object.keys(experiments[name]).length);

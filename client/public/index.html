@@ -42,7 +42,7 @@
 
     <script>
       $(document).ready(function(){
-        <!--ensure_auth();-->
+        ensure_auth();
         list_experiments();
       })
     </script>
@@ -52,6 +52,8 @@
     <div class="container">
       <h1>Welcome to Dashboard</h1>
       <div id="detailed-container">
+        <div id="detailed-plot-controls"></div>
+        <div id="detailed-plot"></div>
         <table class="table" id="detailed">
           <thead id="detailed-header"></thead>
           <tbody id="detailed-body"></tbody>
@@ -59,6 +61,7 @@
       </div>
 
       <div id="experiments-container">
+        <h2>Experiments</h2>
         <table class="table" id="experiments">
           <thead id="experiments-header"></thead>
           <tbody id="experiments-body"></tbody>
