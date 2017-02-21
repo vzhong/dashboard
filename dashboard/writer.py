@@ -10,24 +10,22 @@ class Writer:
 
 
 class ConsoleWriter(Writer):
+
     def __init__(self):
-        self.header = None
+        self.header = set()
         self.cache = []
-        self.last = None
 
     def add(self, metrics):
-        keys = sorted(list(metrics.keys()))
-        if keys != self.header:
-            self.header = keys
-        rows = []
+        for k in metrics.keys():
+            self.header.add(k)
         self.cache.append(metrics)
+        header = sorted(list(self.header))
+        rows = []
         for m in self.cache:
-            rows.append([m.get(k, None) for k in self.header])
+            rows.append([m.get(k, None) for k in header])
         s = tabulate.tabulate(rows, headers=self.header)
-        if self.last:
-            s = "\033[F"*len(self.last.splitlines()) + s
+        s = "\033[F" * (len(s.splitlines()) - 1) + s
         print(s)
-        self.last = s
 
 
 class FileWriter(Writer):
@@ -69,7 +67,11 @@ class FirebaseWriter(Writer):
         self.fb.database().child('experiments').child(self.name).remove()
 
     def add(self, metrics):
-        self.fb.database().child('experiments').child(self.name).push(metrics)
+        try:
+            self.fb.database().child('experiments').child(self.name).push(metrics)
+        except Exception as e:
+            print('Could not write to Dashboard')
+            print(e)
 
 
 if __name__ == '__main__':
