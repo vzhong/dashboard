@@ -19,6 +19,48 @@ function close_experiment() {
 }
 
 
+function plot() {
+    var xlabel = $('#detailed-plot-x').val();
+    var ylabel = $('#detailed-plot-y').val();
+
+    var log = $('#detailed-plot').data('log');
+    var xs = [];
+    var ys = [];
+    for (var i=0; i<log.rows.length; i++) {
+        var row = log.rows[i];
+        var x = row[xlabel];
+        var y = row[ylabel];
+        if (x != null && y != null) {
+            xs.push(x);
+            ys.push(y);
+        }
+    }
+
+    console.log(xs);
+    console.log(ys);
+
+    var trace = {
+        x: xs,
+        y: ys,
+        type: 'scatter',
+        name: ylabel,
+    }
+
+    var layout = {
+        xaxis: {title: xlabel},
+        showlegend: true,
+    }
+
+    var plot_div = 'detailed-plot';
+    if (plot_div.data == null) {
+        Plotly.plot(plot_div, [trace], layout);
+    } else {
+        Plotly.extendTraces(plot_div, trace);
+        Plotly.redraw(plot_div);
+    }
+}
+
+
 function show_experiment(name) {
     var order_log = function(log) {
         var keys = Object.keys(log);
@@ -49,13 +91,29 @@ function show_experiment(name) {
     var table = $('#detailed');
     var header = $('#detailed-header');
     var body = $('#detailed-body');
-    $('#detailed-container').prepend($('<button>')
-        .addClass('btn')
-        .addClass('btn-danger')
-        .text('Close')
-        .attr('onclick', 'close_experiment()')
-    );
-    console.log('showing experiment ' + name);
+    $('#detailed-container')
+        .prepend($('<input>')
+            .attr('id', 'detailed-plot-y')
+            .attr('placeholder', 'Y'))
+            .attr('value', 'score')
+        .prepend($('<input>')
+            .attr('id', 'detailed-plot-x')
+            .attr('placeholder', 'X'))
+            .attr('value', 'iteration')
+        .prepend($('<button>')
+            .addClass('btn')
+            .addClass('btn-primary')
+            .text('Plot')
+            .attr('onclick', 'plot()')
+        )
+        .prepend($('<button>')
+            .addClass('btn')
+            .addClass('btn-danger')
+            .text('Close')
+            .attr('onclick', 'close_experiment()')
+        )
+        .prepend($('<h2>').text('Experiment ' + name));
+
     firebase.database().ref('experiments/' + name).once('value').then(function(s) {
         var log = order_log(s.val());
         make_header(header, log.header);
@@ -63,14 +121,15 @@ function show_experiment(name) {
             body.append(make_row(log.rows[i], log.header));
         }
         table.DataTable();
+        $('#detailed-container').append($('<div>').attr('id', 'detailed-plot').data('log', log));
     });
-    console.log(table);
 }
 
 
-function add_experiment_to_list(table, name) {
+function add_experiment_to_list(table, name, size) {
     table.append($('<tr>')
         .append($('<td>').text(name))
+        .append($('<td>').text(size))
         .append($('<td>')
             .append($('<a>')
                 .attr('onclick', 'show_experiment("' + name + '")')
@@ -84,13 +143,14 @@ function add_experiment_to_list(table, name) {
 
 function list_experiments() {
     firebase.database().ref('experiments').once('value').then(function(s) {
+        $('#experiments-container').prepend($('<h2>').text('Experiments'))
         var table = $('#experiments');
         var header = $('#experiments-header');
         var body = $('#experiments-body');
-        make_header(header, ['Name', 'Open']);
+        make_header(header, ['Name', '# Entries', 'Open']);
         var experiments = s.val();
         for (var name in experiments) {
-            add_experiment_to_list(body, name);
+            add_experiment_to_list(body, name, Object.keys(experiments[name]).length);
         }
         table.DataTable();
     });
