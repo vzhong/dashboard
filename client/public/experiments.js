@@ -91,18 +91,31 @@ function get_choice_list(id, label, options, selected) {
 
 
 function get_detailed_plot_control(name, log) {
+    var x_i = 0;
+    var y_i = 1;
+    for (var i=0; i<log.header.length; i++) {
+        if (log.header[i] == 'iteration') { x_i = i; }
+        if (log.header[i] == 'dev_f1') { y_i = i; }
+    }
     $('#detailed-plot-control')
         .append($('<h2>').text('Experiment ' + name))
         .append($('<form>')
             .addClass('form-inline')
-            .append(get_choice_list('detailed-plot-x', 'X axis:', log.header, 0))
-            .append(get_choice_list('detailed-plot-y', 'Y axis:', log.header, 1))
+            .append(get_choice_list('detailed-plot-x', 'X axis:', log.header, x_i))
+            .append(get_choice_list('detailed-plot-y', 'Y axis:', log.header, y_i))
             .append($('<a>')
                 .addClass('btn')
                 .addClass('btn-danger')
                 .addClass('pull-right')
                 .text('Close')
                 .attr('onclick', 'close_experiment()')
+            )
+            .append($('<a>')
+                .addClass('btn')
+                .addClass('btn-danger')
+                .addClass('pull-right')
+                .text('Clear plot')
+                .attr('onclick', "Plotly.deleteTraces('detailed-plot', 0)")
             )
             .append($('<a>')
                 .addClass('btn')
