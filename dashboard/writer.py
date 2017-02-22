@@ -23,7 +23,7 @@ class ConsoleWriter(Writer):
         rows = []
         for m in self.cache:
             rows.append([m.get(k, None) for k in header])
-        s = tabulate.tabulate(rows, headers=self.header)
+        s = tabulate.tabulate(rows, headers=header)
         s = "\033[F" * (len(s.splitlines()) - 1) + s
         print(s)
 
