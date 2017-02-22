@@ -24,7 +24,7 @@ for epoch in range(10):
 
 ![Console writer](/screenshot/console.gif)
 
-```
+```python
 from dashboard import writer
 from time import sleep
 import numpy as np
