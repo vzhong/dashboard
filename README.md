@@ -22,7 +22,7 @@ for epoch in range(10):
 
 ## Writers
 
-![Console writer](https://gyazo.com/6586b94b0b6827c8d0f3283b44cd0eba)
+![Console writer](/screenshot/console.gif)
 
 ```
 from dashboard import writer
@@ -65,4 +65,4 @@ All of these come with your Firebase config, with the exception of `email` and `
 An example client operating off of my personal Firebase can be found in the `client` directory.
 You can create your own client by replacing the config information in `index.html` with your own Firebase config.
 
-![Dashboard client](https://gyazo.com/28061a5538944cf9c4cfbecccc021087)
+![Dashboard client](/screenshot/client.gif)
