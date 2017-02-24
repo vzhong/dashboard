@@ -1,3 +1,4 @@
 pyrebase
 ujson
+tabluate
 requests
