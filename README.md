@@ -65,4 +65,6 @@ All of these come with your Firebase config, with the exception of `email` and `
 An example client operating off of my personal Firebase can be found in the `client` directory.
 You can create your own client by replacing the config information in `index.html` with your own Firebase config.
 
+NOTE: You will *not* be able to read/write to the database with this client. You have to make your own Firebase database and copy/paste the config settings into the client HTML.
+
 ![Dashboard client](/screenshot/client.gif)
