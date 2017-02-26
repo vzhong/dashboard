@@ -22,6 +22,7 @@
 
     <!-- Local -->
     <script src="table.js"></script>
+    <script src="detailed.js"></script>
     <script src="auth.js"></script>
     <script src="main.js"></script>
 
@@ -58,31 +59,35 @@
         </div>
     </template>
 
+    <template id="detailed">
+        <div>
+            <div class="input-group">
+                <select id="plot-x">
+                    <option :selected="i == 0 || label === 'iteration'" v-for="(label, i) in plot_labels">{{label}}</option>
+                </select>
+                <select id="plot-y">
+                    <option :selected="i == 1 || label === 'loss'" v-for="(label, i) in plot_labels">{{label}}</option>
+                </select>
+                <button @click="plot(log)" class="btn btn-primary">Plot</button>
+                <button @click="delete_trace()" class="btn btn-danger">Delete trace</button>
+                <button v-if="close" @click="close()" class="btn btn-danger">Close</button>
+            </div>
+            <div id="plot"></div>
+            <vtable
+                :header="plot_labels"
+                :rows="log"
+                :page_size="10"
+            ></vtable>
+        </div>
+    </template>
 </head>
 
 <body>
     <div id="app" class="container">
         <h1>{{title}}</h1>
-        <div id="detailed-block">
-            <div v-if="detailed">
-                <div class="input-group">
-                    <select class="selectpicker" id="detailed-plot-x">
-                        <option :selected="i == 0 || label === 'iteration'" v-for="(label, i) in detailed_labels">{{label}}</option>
-                    </select>
-                    <select class="selectpicker" id="detailed-plot-y">
-                        <option :selected="i == 1 || label === 'loss'" v-for="(label, i) in detailed_labels">{{label}}</option>
-                    </select>
-                    <button @click="detailed_plot(detailed)" class="btn btn-primary">Plot</button>
-                    <button @click="detailed_delete_trace()" class="btn btn-danger">Delete trace</button>
-                    <button @click="detailed_close()" class="btn btn-danger">Close</button>
-                </div>
-                <div id="detailed-plot"></div>
-                <vtable
-                    :header="detailed_labels"
-                    :rows="detailed_log"
-                    :page_size="10"
-                ></vtable>
-            </div>
+
+        <div v-if="detailed">
+            <detailed :experiment="detailed" :close="detailed_close"></detailed>
         </div>
 
         <div id="experiments-block">
@@ -94,25 +99,6 @@
                 :show="show"
                 :remove="remove"
             ></vtable>
-            <!--<table class="table table-striped">-->
-                <!--<thead>-->
-                    <!--<tr>-->
-                        <!--<th>Experiment</th>-->
-                        <!--<th># Entries</th>-->
-                        <!--<th>Options</th>-->
-                    <!--</tr>-->
-                <!--</thead>-->
-                <!--<tbody>-->
-                    <!--<tr v-for="e in experiments">-->
-                        <!--<td>{{e['.key']}}</td>-->
-                        <!--<td>{{Object.keys(e).length-1}}</td>-->
-                        <!--<td>-->
-                            <!--<button class="btn btn-primary" @click="detailed_show(e)">Show</button>-->
-                            <!--<button class="btn btn-danger" @click="delete_experiment(e)">Delete</button>-->
-                        <!--</td>-->
-                    <!--</tr>-->
-                <!--</tbody>-->
-            <!--</table>-->
         </div>
     </div>
 </body>

@@ -26,33 +26,7 @@ window.onload = function() {
             experiments: db.ref('experiments'),
         },
         computed: {
-            detailed_log: function () {
-                var rows = [];
-                for (var key in this.detailed) {
-                    if (key !== '.key') {
-                        rows.push(this.detailed[key]);
-                    }
-                }
-                return rows;
-            },
-            detailed_labels: function () {
-                var labels = [];
-                var log = this.detailed_log;
-                for (var i=0; i<log.length; i++) {
-                    var row = log[i];
-                    for (var k in row) {
-                        if (typeof k === 'string') {
-                            labels[k] = true;
-                        }
-                    }
-                }
-                labels = Object.keys(labels);
-                labels.sort();
-                return labels;
-            },
-            detailed_name: function() {
-                return this.detailed['.key'];
-            },
+
             processed_experiments: function() {
                 var list = [];
                 this.experiments.forEach(function(e) {
@@ -73,38 +47,8 @@ window.onload = function() {
             remove: function(row) {
                 this.$firebaseRefs.experiments.child(row.orig['.key']).remove();
             },
-            detailed_plot(e) {
-                var x = document.getElementById('detailed-plot-x').value;
-                var y = document.getElementById('detailed-plot-y').value;
-                var log = this.detailed_log;
-                var xs = [];
-                var ys = [];
-                for (var i=0; i<log.length; i++) {
-                    var row = log[i];
-                    if (row[x] != null && row[y] != null) {
-                        xs.push(row[x]);
-                        ys.push(row[y]);
-                    }
-                }
-                var trace = {x: xs, y: ys, type: 'scatter', name: y}
-                var layout = {
-                    title: 'Plot for ' + this.detailed_name,
-                    xaxis: {title: x},
-                    showlegend: true,
-                }
-                var plot_div = 'detailed-plot';
-                if (plot_div.data == null) {
-                    Plotly.plot(plot_div, [trace], layout);
-                } else {
-                    Plotly.extendTraces(plot_div, trace);
-                    Plotly.redraw(plot_div);
-                }
-            },
-            detailed_delete_trace() {
-                Plotly.deleteTraces('detailed-plot', 0);
-            },
             detailed_close() {
-                Plotly.purge('detailed-plot')
+                Plotly.purge('plot')
                 this.detailed = null;
             },
         },
