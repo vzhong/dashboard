@@ -20,10 +20,6 @@ window.onload = function() {
             title: 'Welcome to Dashboard',
             detailed: null,
             experiments_header: ['Experiment', '# Entries'],
-            messages: {
-                error: null,
-                info: null,
-            },
         },
         firebase: {
             experiments: db.ref('experiments'),
