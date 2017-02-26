@@ -60,11 +60,48 @@ Note that in order for `FirebaseWriter` to work, you need to create a config fil
 All of these come with your Firebase config, with the exception of `email` and `password` which correspond to a user that you create inside your Firebase (who has access to the database).
 
 
-## Client
+## Firebase Web Client
 
 An example client operating off of my personal Firebase can be found in the `client` directory.
-You can create your own client by replacing the config information in `index.html` with your own Firebase config.
 
-NOTE: You will *not* be able to read/write to the database with this client. You have to make your own Firebase database and copy/paste the config settings into the client HTML.
+NOTE: You will **not** be able to read/write to the database with this client until you have done the following:
+
+1. Create an app on Firebase and locate your config according to [this guide](https://firebase.google.com/docs/web/setup).
+2. Enable email accounts and create an account/password for `FirebaseWriter` according to [this guide](https://firebase.google.com/docs/auth/web/password-auth).
+3. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
+4. Copy in your Firebase config from Step 1 into `main.js`.
+
+Once you have done so, you can launch the web server in one of the following ways.
+
+### Hosting static webpages
+
+You can host the web pages on your machine by launching a simple http server.
+
+```bash
+# this is assuming you are using python 3
+cd client/public && python -m http.server 9090
+```
+
+You should now be able to visit [localhost:9090](http://localhost:9090).
+
+### Hosting on Firebase
+
+Follow [these instructions](https://firebase.google.com/docs/hosting/quickstart) to set up Firebase tools.
+
+Next, the following command will deploy your app and print out the hosted URL.
+
+```bash
+cd client && firebase deploy
+```
+
+### Static webpage
+
+You can actually use a static web page! Just open `client/public/index.html`.
+
+There is of course a catch to this, which is that Firebase's javascript authentication does not work from `file://...`.
+
+You can either fix the authentication by [authenticating via some other means](http://stackoverflow.com/questions/37362957/ionic-framework-and-firebase-3-x-version-this-domain-is-not-authorized-for-oaut/37439461#37439461),
+or, if you just don't care, you can [change the rules of your database](https://firebase.google.com/docs/database/security/) to allow reads by anybody (probably not a good idea).
+
 
 ![Dashboard client](/screenshot/client.gif)
