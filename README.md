@@ -87,6 +87,7 @@ You should now be able to visit [localhost:9090](http://localhost:9090).
 ### Hosting on Firebase
 
 Follow [these instructions](https://firebase.google.com/docs/hosting/quickstart) to set up Firebase tools.
+Remember that you will need to change `client/.firebaserc` to point to your own app.
 
 Next, the following command will deploy your app and print out the hosted URL.
 
@@ -98,10 +99,20 @@ cd client && firebase deploy
 
 You can actually use a static web page! Just open `client/public/index.html`.
 
-There is of course a catch to this, which is that Firebase's javascript authentication does not work from `file://...`.
+There is of course a catch to this: the redirect authentication I am using does not work from `file://...`.
 
 You can either fix the authentication by [authenticating via some other means](http://stackoverflow.com/questions/37362957/ionic-framework-and-firebase-3-x-version-this-domain-is-not-authorized-for-oaut/37439461#37439461),
 or, if you just don't care, you can [change the rules of your database](https://firebase.google.com/docs/database/security/) to allow reads by anybody (probably not a good idea).
 
-
 ![Dashboard client](/screenshot/client.gif)
+
+
+# Contribution
+
+Pull requests are welcome!
+
+The project is set up as follows:
+
+- `dashboard` contains the Dashboard python package, whose installation script is `setup.py`.
+- `client` contains the Firebase app.
+- `client/public` contains source code for the client, mostly written in very basic [VueJS](https://vuejs.org/).
