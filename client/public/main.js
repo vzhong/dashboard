@@ -11,7 +11,6 @@ window.onload = function() {
     firebase.initializeApp(config);
 
     var db = firebase.database();
-    ensure_auth();
 
     // Initialize Vue
     var app = new Vue({
@@ -36,6 +35,9 @@ window.onload = function() {
                 })
                 return list
             },
+        },
+        mounted: function () {
+            ensure_auth();
         },
         methods: {
             show: function(row) {

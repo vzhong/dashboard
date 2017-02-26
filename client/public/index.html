@@ -29,6 +29,13 @@
     <!-- Templates -->
     <template id="vtable">
         <div>
+            <div class="input-group form-group col-xs-6">
+                <span class="input-group-addon" id="page_size_addon">Page size</span>
+                <input v-model.number="user_page_size" type="text" class="form-control" aria-describedby="page_size_addon">
+                <span class="input-group-addon" id="query_addon">Search</span>
+                <input v-model.trim="user_query" type="text" class="form-control" aria-describedby="query_addon">
+            </div>
+
             <table class="table table-striped">
                 <tr>
                     <th v-for="col in header" style="white-space: nowrap;">
@@ -46,6 +53,7 @@
                     </td>
                 </tr>
             </table>
+
             <nav aria-label="...">
                 <ul class="pagination">
                     <li><a @click="change_page(current_page-1)" href="#" aria-label="Previous"><span>Prev</span></a></li>
@@ -61,6 +69,7 @@
 
     <template id="detailed">
         <div>
+            <h2>Experiment {{name}}</h2>
             <div class="input-group">
                 <select id="plot-x">
                     <option :selected="i == 0 || label === 'iteration'" v-for="(label, i) in plot_labels">{{label}}</option>
@@ -72,11 +81,12 @@
                 <button @click="delete_trace()" class="btn btn-danger">Delete trace</button>
                 <button v-if="close" @click="close()" class="btn btn-danger">Close</button>
             </div>
+            <div class="col-xs-12" style="height:20px;"></div>
             <div id="plot"></div>
             <vtable
                 :header="plot_labels"
                 :rows="log"
-                :page_size="10"
+                :default_page_size="10"
             ></vtable>
         </div>
     </template>
@@ -95,7 +105,7 @@
             <vtable
                 :header="experiments_header"
                 :rows="processed_experiments"
-                :page_size="10"
+                :default_page_size="10"
                 :show="show"
                 :remove="remove"
             ></vtable>
