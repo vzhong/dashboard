@@ -1,73 +1,107 @@
 <!DOCTYPE html>
 <html>
-  <head>
-
+<head>
     <meta charset="utf-8">
     <title>Dashboard</title>
-    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyC5gIyB7XBw3UYsU6EJI2MJAVs5IFnf6vY",
-        authDomain: "dashboard-ffc72.firebaseapp.com",
-        databaseURL: "https://dashboard-ffc72.firebaseio.com",
-        storageBucket: "dashboard-ffc72.appspot.com",
-        messagingSenderId: "1081800712753"
-      };
-      firebase.initializeApp(config);
-    </script>
 
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!--Firebase-->
+    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+    <!--Vue-->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!--VueFire-->
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-    <!-- DataTable -->
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css">
-    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
 
     <!-- Plotly -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <!-- Local -->
     <script src="auth.js"></script>
-    <script src="experiments.js"></script>
+    <script src="main.js"></script>
 
-    <script>
-      $(document).ready(function(){
-        ensure_auth();
-        list_experiments();
-      })
+    <script type="text/x-template" id="grid-template">
+      <table>
+        <thead>
+          <tr>
+            <th v-for="key in columns"
+              @click="sortBy(key)"
+              :class="{ active: sortKey == key }">
+              {{ key | capitalize }}
+              <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="entry in filteredData">
+            <td v-for="key in columns">
+              {{entry[key]}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </script>
+</head>
 
-  </head>
-  <body>
-    <div class="container">
-      <h1>Welcome to Dashboard</h1>
-      <div id="detailed-container">
-        <div id="detailed-plot-controls"></div>
-        <div id="detailed-plot"></div>
-        <table class="table" id="detailed">
-          <thead id="detailed-header"></thead>
-          <tbody id="detailed-body"></tbody>
-        </table>
-      </div>
-
-      <div id="experiments-container">
-        <h2>Experiments</h2>
-        <table class="table" id="experiments">
-          <thead id="experiments-header"></thead>
-          <tbody id="experiments-body"></tbody>
-        </table>
-      </div>
+<body>
+    <div id="app" class="container">
+        <h1>{{title}}</h1>
+         <div id="detailed-block">
+            <div v-if="detailed">
+                <h2>{{detailed_name}}</h2>
+                <div class="input-group">
+                    <select class="selectpicker" id="detailed-plot-x">
+                        <option :selected="i == 0 || label === 'iteration'" v-for="(label, i) in detailed_labels">{{label}}</option>
+                    </select>
+                    <select class="selectpicker" id="detailed-plot-y">
+                        <option :selected="i == 1 || label === 'loss'" v-for="(label, i) in detailed_labels">{{label}}</option>
+                    </select>
+                    <button @click="detailed_plot(detailed)" class="btn btn-primary">Plot</button>
+                    <button @click="detailed_delete_trace()" class="btn btn-danger">Delete trace</button>
+                    <button @click="detailed_close()" class="btn btn-danger">Close</button>
+                </div>
+                <div id="detailed-plot"></div>
+                <table class="table table-striped" id="detailed-table">
+                    <thead>
+                        <tr>
+                            <th v-for="label in detailed_labels">{{label}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="row in detailed_log">
+                            <td v-for="label in detailed_labels">{{row[label]}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="experiments-block">
+            <h2>Experiments</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Experiment</th>
+                        <th># Entries</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="e in experiments">
+                        <td>{{e['.key']}}</td>
+                        <td>{{Object.keys(e).length-1}}</td>
+                        <td>
+                            <button class="btn btn-primary" @click="detailed_show(e)">Show</button>
+                            <button class="btn btn-danger" @click="delete_experiment(e)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </body>
+</body>
 </html>
