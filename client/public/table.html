@@ -16,9 +16,13 @@
             <h2 v-if='name'>{{name}}</h2>
             <table class="table table-striped">
                 <tr>
-                    <th v-for="col in header">{{col}}</th>
+                    <th v-for="col in header">
+                        <a @click="sort_by(col)">{{col}}</a>
+                        <span v-if="sort_key === col" class="glyphicon" :class="(sort_order === 'asc')? 'glyphicon-arrow-up' : 'glyphicon-arrow-down'"></span>
+                        <span v-if="sort_key !== col" class="glyphicon glyphicon-arrow-up" style="opacity: 0.25"></span>
+                    </th>
                 </tr>
-                <tr v-for="row in rows">
+                <tr v-for="row in processed_data">
                     <td v-for="col in header">{{row[col]}}</td>
                 </tr>
             </table>
