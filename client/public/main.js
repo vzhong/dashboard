@@ -11,6 +11,7 @@ window.onload = function() {
     firebase.initializeApp(config);
 
     var db = firebase.database();
+    ensure_auth();
 
     // Initialize Vue
     var app = new Vue({
@@ -19,14 +20,15 @@ window.onload = function() {
             title: 'Welcome to Dashboard',
             detailed: null,
             experiments_header: ['Experiment', '# Entries'],
-
+            messages: {
+                error: null,
+                info: null,
+            },
         },
-        ready: function () { ensure_auth() },
         firebase: {
             experiments: db.ref('experiments'),
         },
         computed: {
-
             processed_experiments: function() {
                 var list = [];
                 this.experiments.forEach(function(e) {
@@ -47,7 +49,7 @@ window.onload = function() {
             remove: function(row) {
                 this.$firebaseRefs.experiments.child(row.orig['.key']).remove();
             },
-            detailed_close() {
+            detailed_close: function() {
                 Plotly.purge('plot')
                 this.detailed = null;
             },
