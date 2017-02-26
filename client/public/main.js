@@ -17,11 +17,11 @@ window.onload = function() {
         el: '#app',
         data: {
             title: 'Welcome to Dashboard',
-            user: ensure_auth(),
             detailed: null,
-            experiments_columns: ['Name', '# Entries', ''],
-            experiments_options: {},
+            experiments_header: ['Experiment', '# Entries'],
+
         },
+        ready: function () { ensure_auth() },
         firebase: {
             experiments: db.ref('experiments'),
         },
@@ -53,10 +53,25 @@ window.onload = function() {
             detailed_name: function() {
                 return this.detailed['.key'];
             },
+            processed_experiments: function() {
+                var list = [];
+                this.experiments.forEach(function(e) {
+                    var r = {}
+                    r['Experiment'] = e['.key']
+                    r['# Entries'] = Object.keys(e).length - 1
+                    r['orig'] = e
+                    list.push(r)
+                })
+                return list
+            },
         },
         methods: {
-            detailed_show(e) {
-                this.detailed = e;
+            show: function(row) {
+                if (this.detailed) { this.detailed_close() }
+                this.detailed = row.orig;
+            },
+            remove: function(row) {
+                this.$firebaseRefs.experiments.child(row.orig['.key']).remove();
             },
             detailed_plot(e) {
                 var x = document.getElementById('detailed-plot-x').value;
@@ -89,10 +104,8 @@ window.onload = function() {
                 Plotly.deleteTraces('detailed-plot', 0);
             },
             detailed_close() {
+                Plotly.purge('detailed-plot')
                 this.detailed = null;
-            },
-            delete_experiment(e) {
-                this.$firebaseRefs.experiments.child(e['.key']).remove();
             },
         },
     });
