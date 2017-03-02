@@ -68,8 +68,9 @@ NOTE: You will **not** be able to read/write to the database with this client un
 
 1. Create an app on Firebase and locate your config according to [this guide](https://firebase.google.com/docs/web/setup).
 2. Enable email accounts and create an account/password for `FirebaseWriter` according to [this guide](https://firebase.google.com/docs/auth/web/password-auth). Note that **you don't need to do this via Javascript**, instead, just go to your users tab in Firebase and create an account.
-3. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
-4. Copy in your Firebase config from Step 1 into `main.js`.
+3. Also enable Google accounts. You will use Google accounts for login via the web client and the email account from Step 2. for `FirebaseWriter`. Note that these two accounts need to have different emails, unless you disable this restriction in Firebase.
+4. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
+5. Copy in your Firebase config from Step 1 into `main.js`.
 
 Once you have done so, you can launch the web server in one of the following ways.
 
