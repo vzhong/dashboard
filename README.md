@@ -49,7 +49,7 @@ Note that in order for `FirebaseWriter` to work, you need to create a config fil
 {
   "email": "email for a user in your Firebase",
   "password": "password for the user in your Firebase",
-  "secret": "Firebase secret",
+  "secret": "some secret (you can put whatever you want)",
   "apiKey": "Firebase API key",
   "authDomain": "Firebase auth domain",
   "databaseURL": "Firebase database URL",
@@ -67,7 +67,7 @@ An example client operating off of my personal Firebase can be found in the `cli
 NOTE: You will **not** be able to read/write to the database with this client until you have done the following:
 
 1. Create an app on Firebase and locate your config according to [this guide](https://firebase.google.com/docs/web/setup).
-2. Enable email accounts and create an account/password for `FirebaseWriter` according to [this guide](https://firebase.google.com/docs/auth/web/password-auth).
+2. Enable email accounts and create an account/password for `FirebaseWriter` according to [this guide](https://firebase.google.com/docs/auth/web/password-auth). Note that **you don't need to do this via Javascript**, instead, just go to your users tab in Firebase and create an account.
 3. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
 4. Copy in your Firebase config from Step 1 into `main.js`.
 
