@@ -117,3 +117,8 @@ The project is set up as follows:
 - `dashboard` contains the Dashboard python package, whose installation script is `setup.py`.
 - `client` contains the Firebase app.
 - `client/public` contains source code for the client, mostly written in very basic [VueJS](https://vuejs.org/).
+
+If you'd like to help out, here are some features that would be nice to have:
+
+- [ ] login via email, so we don't have to create separate users for `FirebaseWriter` and for web login.
+- [ ] plot multiple experiments in same figure.
