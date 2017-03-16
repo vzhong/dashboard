@@ -1,6 +1,6 @@
 # dashboard
 
-Dashboard provides utilities to make and visualize experiment logs.
+Dashboard provides utilities to make and visualize experiment logs. Yes, now you can run your experiments on your server and view your logs on your phone like you've always wanted.
 
 
 ## Reporting
