@@ -44,6 +44,7 @@ class FileWriter(Writer):
 class FirebaseWriter(Writer):
 
     def __init__(self, name, delete_existing=False):
+        assert name, '"name" cannot be empty!'
         fconfig = os.path.join(os.environ['HOME'], '.fb.config')
         assert os.path.isfile(fconfig), 'Failed to load config file from {}'.format(fconfig)
         with open(fconfig) as f:
