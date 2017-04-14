@@ -1,6 +1,5 @@
 import os
 import ujson as json
-import pyrebase
 import tabulate
 
 
@@ -44,6 +43,7 @@ class FileWriter(Writer):
 class FirebaseWriter(Writer):
 
     def __init__(self, name, delete_existing=False):
+        import pyrebase
         assert name, '"name" cannot be empty!'
         fconfig = os.path.join(os.environ['HOME'], '.fb.config')
         assert os.path.isfile(fconfig), 'Failed to load config file from {}'.format(fconfig)
