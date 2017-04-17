@@ -6,7 +6,7 @@ Dashboard provides utilities to make and visualize experiment logs. Yes, now you
 ## Reporting
 
 ```python
-from dashboard import report
+from dashboard import reporter
 import numpy as np
 
 r = report.Reporter()
