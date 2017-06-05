@@ -4,112 +4,69 @@
     <meta charset="utf-8">
     <title>Dashboard</title>
 
-    <!--Firebase-->
-    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-    <!--Vue-->
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <!--VueFire-->
-    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
-
-    <!-- Bootstrap -->
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Plotly -->
-    <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-    <!-- Local -->
-    <script src="table.js"></script>
-    <script src="detailed.js"></script>
-    <script src="auth.js"></script>
-    <script src="main.js"></script>
-
-    <!-- Templates -->
-    <template id="vtable">
-        <div>
-            <div class="input-group form-group col-xs-6">
-                <span class="input-group-addon" id="page_size_addon">Page size</span>
-                <input v-model.number="user_page_size" type="text" class="form-control" aria-describedby="page_size_addon">
-                <span class="input-group-addon" id="query_addon">Search</span>
-                <input v-model.trim="user_query" type="text" class="form-control" aria-describedby="query_addon">
-            </div>
-
-            <table class="table table-striped">
-                <tr>
-                    <th v-for="col in header" style="white-space: nowrap;">
-                        <a @click="sort_by(col)">{{col}}</a>
-                        <span v-if="sort_key === col" class="glyphicon" :class="(sort_order === 'asc')? 'glyphicon-arrow-up' : 'glyphicon-arrow-down'"></span>
-                        <span v-if="sort_key !== col" class="glyphicon glyphicon-arrow-up" style="opacity: 0.25"></span>
-                    </th>
-                    <th v-if="show || remove"></th>
-                </tr>
-                <tr v-for="row in processed_data">
-                    <td v-for="col in header">{{row[col]}}</td>
-                    <td v-if="show || remove">
-                        <button v-if="show" class="btn btn-primary" @click="show(row)">Show</button>
-                        <button v-if="remove" class="btn btn-danger" @click="remove(row)">Remove</button>
-                    </td>
-                </tr>
-            </table>
-
-            <nav aria-label="...">
-                <ul class="pagination">
-                    <li><a @click="change_page(current_page-1)" href="#" aria-label="Previous"><span>Prev</span></a></li>
-                    <li
-                        v-for="i in page_nums" :class="current_page == i? 'active' : ''"
-                        @click="change_page(i)"
-                    ><a href="#">{{i + 1}}</a></li>
-                    <li><a @click="change_page(current_page+1)" href="#" aria-label="Next"><span>Next</span></a></li>
-                </ul>
-            </nav>
-        </div>
-    </template>
-
-    <template id="detailed">
-        <div>
-            <h2>Experiment {{name}}</h2>
-            <div class="input-group">
-                <select id="plot-x">
-                    <option :selected="i == 0 || label === 'iteration'" v-for="(label, i) in plot_labels">{{label}}</option>
-                </select>
-                <select id="plot-y">
-                    <option :selected="i == 1 || label === 'loss'" v-for="(label, i) in plot_labels">{{label}}</option>
-                </select>
-                <button @click="plot(log)" class="btn btn-primary">Plot</button>
-                <button @click="delete_trace()" class="btn btn-danger">Delete trace</button>
-                <button v-if="close" @click="close()" class="btn btn-danger">Close</button>
-            </div>
-            <div class="col-xs-12" style="height:20px;"></div>
-            <div id="plot"></div>
-            <vtable
-                :header="plot_labels"
-                :rows="log"
-                :default_page_size="10"
-            ></vtable>
-        </div>
-    </template>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css" />
 </head>
 
 <body>
-    <div id="app" class="container">
-        <h1>{{title}}</h1>
+  <div id="app">
+    <navbar :items="navbar.items">
+      <div class="title is-3">
+        Dashboard
+      </div>
+    </navbar>
+    <section style="margin-top: 2cm;" class="container is-fluid">
+      <div v-if="user">
+        <router-view></router-view>
+      </div>
+      <div v-else>
+        <login></login>
+      </div>
+    </section>
+  </div>
 
-        <div v-if="detailed">
-            <detailed :experiment="detailed" :close="detailed_close"></detailed>
+  <section>
+    <footer class="footer">
+      <div class="container is-fluid">
+        <div class="content">
+          <p>
+            <a class="icon" href="https://github.com/vzhong/dashboard">
+              <i class="fa fa-github"></i>
+            </a>
+            <strong>Dashboard</strong> by <a href="http://victorzhong.com">Victor Zhong</a>
+          </p>
         </div>
+      </div>
+      <!--Firebase-->
+      <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
 
-        <div id="experiments-block">
-            <h2>Experiments</h2>
-            <vtable
-                :header="experiments_header"
-                :rows="processed_experiments"
-                :default_page_size="10"
-                :show="show"
-                :remove="remove"
-            ></vtable>
-        </div>
-    </div>
+      <!--Vue-->
+      <script src="https://unpkg.com/vue/dist/vue.js"></script>
+      <!--Vue Router-->
+      <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+      <!--VueFire-->
+      <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+      <!--Vuex-->
+      <script src="https://unpkg.com/vuex"></script>
+
+      <!-- Plotly -->
+      <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+      <!-- Local -->
+      <script src="components/notification.js"></script>
+      <script src="components/navbar.js"></script>
+      <script src="components/grid.js"></script>
+
+      <script src="components/event.js"></script>
+      <script src="components/experiment_listing.js"></script>
+      <script src="components/plot.js"></script>
+      <script src="components/detailed.js"></script>
+      <script src="components/experiment_listings.js"></script>
+      <script src="components/login.js"></script>
+
+      <script src="home.js"></script>
+      <script src="main.js"></script>
+    </footer>
+  </section>
 </body>
 </html>

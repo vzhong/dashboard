@@ -68,9 +68,8 @@ NOTE: You will **not** be able to read/write to the database with this client un
 
 1. Create an app on Firebase and locate your config according to [this guide](https://firebase.google.com/docs/web/setup).
 2. Enable email accounts and create an account/password for `FirebaseWriter` according to [this guide](https://firebase.google.com/docs/auth/web/password-auth). Note that **you don't need to do this via Javascript**, instead, just go to your users tab in Firebase and create an account.
-3. Also enable Google accounts. You will use Google accounts for login via the web client and the email account from Step 2. for `FirebaseWriter`. Note that these two accounts need to have different emails, unless you disable this restriction in Firebase.
-4. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
-5. Copy in your Firebase config from Step 1 into `main.js`.
+3. Create `~/.fb.config`, copying in your Firebase config from Step 1 and the account credentials from Step 2.
+4. Copy in your Firebase config from Step 1 into `main.js`.
 
 Once you have done so, you can launch the web server in one of the following ways.
 
@@ -100,10 +99,8 @@ cd client && firebase deploy
 
 You can actually use a static web page! Just open `client/public/index.html`.
 
-There is of course a catch to this: the redirect authentication I am using does not work from `file://...`.
 
-You can either fix the authentication by [authenticating via some other means](http://stackoverflow.com/questions/37362957/ionic-framework-and-firebase-3-x-version-this-domain-is-not-authorized-for-oaut/37439461#37439461),
-or, if you just don't care, you can [change the rules of your database](https://firebase.google.com/docs/database/security/) to allow reads by anybody (probably not a good idea).
+### Demo
 
 ![Dashboard client](/screenshot/client.gif)
 
@@ -117,8 +114,3 @@ The project is set up as follows:
 - `dashboard` contains the Dashboard python package, whose installation script is `setup.py`.
 - `client` contains the Firebase app.
 - `client/public` contains source code for the client, mostly written in very basic [VueJS](https://vuejs.org/).
-
-If you'd like to help out, here are some features that would be nice to have:
-
-- [ ] login via email, so we don't have to create separate users for `FirebaseWriter` and for web login.
-- [ ] plot multiple experiments in same figure.

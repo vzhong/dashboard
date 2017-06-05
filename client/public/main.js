@@ -1,56 +1,50 @@
-window.onload = function() {
+// Initialize Vue
 
-    // Initialize Firebase
-    var config = {
+const router = new VueRouter({
+  routes: [
+    { path: '/', name: 'home', component: Home },
+  ]
+})
+
+
+const app = new Vue({
+  router: router,
+  mounted() {
+    let config = {
       apiKey: "AIzaSyC5gIyB7XBw3UYsU6EJI2MJAVs5IFnf6vY",
       authDomain: "dashboard-ffc72.firebaseapp.com",
       databaseURL: "https://dashboard-ffc72.firebaseio.com",
       storageBucket: "dashboard-ffc72.appspot.com",
       messagingSenderId: "1081800712753"
     };
-    firebase.initializeApp(config);
-
-    var db = firebase.database();
-
-    // Initialize Vue
-    var app = new Vue({
-        el: '#app',
-        data: {
-            title: 'Welcome to Dashboard',
-            detailed: null,
-            experiments_header: ['Experiment', '# Entries'],
-        },
-        firebase: {
-            experiments: db.ref('experiments'),
-        },
-        computed: {
-            processed_experiments: function() {
-                var list = [];
-                this.experiments.forEach(function(e) {
-                    var r = {}
-                    r['Experiment'] = e['.key']
-                    r['# Entries'] = Object.keys(e).length - 1
-                    r['orig'] = e
-                    list.push(r)
-                })
-                return list
-            },
-        },
-        mounted: function () {
-            ensure_auth();
-        },
-        methods: {
-            show: function(row) {
-                if (this.detailed) { this.detailed_close() }
-                this.detailed = row.orig;
-            },
-            remove: function(row) {
-                this.$firebaseRefs.experiments.child(row.orig['.key']).remove();
-            },
-            detailed_close: function() {
-                Plotly.purge('plot')
-                this.detailed = null;
-            },
-        },
-    });
-}
+    firebase.initializeApp(config)
+    var parent = this
+    firebase.auth().onAuthStateChanged(function(user) {
+      parent.user = user
+    })
+  },
+  methods: {
+    logout() {
+      if (firebase.auth().currentUser) {
+        firebase.auth().signOut()
+      }
+      this.user = null
+    }
+  },
+  computed: {
+    navbar() {
+      var logo = '/static/logo.png'
+      var items = [
+        {name: 'Home', route: '/'}
+      ]
+      if (this.user) {
+        items.push({name: this.user.email, route: '/'})
+        items.push({name: 'Logout', func: this.logout})
+      }
+      return {logo, items}
+    }
+  },
+  data: {
+    user: null,
+  }
+}).$mount('#app')
