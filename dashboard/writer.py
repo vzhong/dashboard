@@ -1,33 +1,50 @@
 import os
-import ujson as json
-import tabulate
+import json
 
 
 class Writer:
+
     def add(self, metrics):
+        """
+        Args:
+            metrics (dict): metrics to write
+        """
         raise NotImplementedError()
 
 
 class ConsoleWriter(Writer):
+    """
+    Writes metrics to standard output
+
+    Attributes:
+        header (set): headers with which to format each output line
+    """
 
     def __init__(self):
         self.header = set()
-        self.cache = []
 
     def add(self, metrics):
+        for k, v in metrics.items():
+            if isinstance(v, float):
+                metrics[k] = "{0:.6g}".format(v)
+        old_header_size = len(self.header)
         for k in metrics.keys():
             self.header.add(k)
-        self.cache.append(metrics)
         header = sorted(list(self.header))
-        rows = []
-        for m in self.cache:
-            rows.append([m.get(k, None) for k in header])
-        s = tabulate.tabulate(rows, headers=header)
-        s = "\033[F" * (len(s.splitlines()) - 1) + s
-        print(s)
+        row = [metrics[h] for h in header]
+        fmt = "{: >10} " * len(header)
+        if len(header) != old_header_size:
+            print(fmt.format(*header))
+        print(fmt.format(*row))
 
 
 class FileWriter(Writer):
+    """
+    Writes metrics to file
+
+    Attributes:
+        fname (str): file to write to
+    """
 
     def __init__(self, fname):
         self.fname = fname
@@ -41,6 +58,15 @@ class FileWriter(Writer):
 
 
 class FirebaseWriter(Writer):
+    """
+    Writes metrics to a database on Firebase.
+
+    Note:
+        In order for this to work, you must set up an app on Firebase and do the following:
+        1. Copy your app's configuration to a JSON file at ``~/.fb.config``
+        2. Setup email/password login and create an user
+        3. Write the user's email and password to ``~/.fb.config`` under the fields ``email`` and ``password``
+    """
 
     def __init__(self, name, delete_existing=False):
         import pyrebase
@@ -57,6 +83,9 @@ class FirebaseWriter(Writer):
             self.delete()
 
     def delete(self):
+        """
+        Deletes the experiment from Firebase
+        """
         self.user = self.fb.auth().refresh(self.user['refreshToken'])
         self.fb.database().child('experiments').child(self.name).remove(self.user['idToken'])
 
@@ -70,9 +99,20 @@ class FirebaseWriter(Writer):
 
 
 if __name__ == '__main__':
-    w = FirebaseWriter('my_exp')
+    w = ConsoleWriter()
     import time
-    for i in range(10):
-        print(i)
-        w.add({'iteration': i, 'score': i+1})
-        time.sleep(1)
+    import random
+    random.seed()
+    for i in range(5):
+        w.add({'iteration': i, 'score': random.uniform(0, 10)})
+        time.sleep(0.1)
+    for i in range(5, 10):
+        w.add({'iteration': i, 'score': random.uniform(0, 10), 'new_score': random.uniform(0, 10)})
+        time.sleep(0.1)
+
+    w = FirebaseWriter("myexp", delete_existing=True)
+    random.seed()
+    for i in range(5):
+        w.add({'iteration': i, 'score': random.uniform(0, 10)})
+        print('wrote to firebase data from iteration {}'.format(i))
+
