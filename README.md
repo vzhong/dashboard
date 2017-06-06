@@ -28,19 +28,26 @@ for epoch in range(10):
 from dashboard import writer
 from time import sleep
 import numpy as np
+import random
+random.seed()
 
-writers = [
-    writer.ConsoleWriter(),         # writes to stdout
-    writer.FileWriter('foo.log'),   # writes to 'foo.log'
-    writer.FirebaseWriter('my_exp') # writes to Firebase (details below)
-]
-
+console_writer = writer.ConsoleWriter()
+file_writer = writer.FileWriter('foo.log')   # writes to 'foo.log'
 for epoch in range(3):
     for i in range(2):
         metrics = {'f1': np.random.uniform(0, 1), 'iteration': i, 'epoch': epoch}
-        for w in writers:
-            w.add(metrics)
+        console_writer.add(metrics)
+        file_writer.add(metrics)
         sleep(0.5)
+
+exp1_hyperparams = {'d_hid': 100, 'dropout': 0.5, 'model': 'foo'}
+exp2_hyperparams = {'d_hid': 200, 'dropout': 0.3, 'model': 'bar', 'comment': 'hello world!'}
+writer1 = writer.FirebaseWriter('myexp1', exp1_hyperparams, delete_existing=True)
+writer2 = writer.FirebaseWriter('myexp2', exp2_hyperparams, delete_existing=True)
+for i in range(5):
+    writer1.add({'iteration': i, 'score': random.uniform(0, 10)})
+    writer2.add({'iteration': i, 'score': random.uniform(0, 10)})
+    print('wrote to firebase data from iteration {}'.format(i))
 ```
 
 Note that in order for `FirebaseWriter` to work, you need to create a config file `~/.fb.config` like follows:
