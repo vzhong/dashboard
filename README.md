@@ -69,6 +69,8 @@ All of these come with your Firebase config, with the exception of `email` and `
 
 ## Firebase Web Client
 
+![Dashboard client](/screenshot/client.gif)
+
 An example client operating off of my personal Firebase can be found in the `client` directory.
 
 NOTE: You will **not** be able to read/write to the database with this client until you have done the following:
@@ -105,11 +107,6 @@ cd client && firebase deploy
 ### Static webpage
 
 You can actually use a static web page! Just open `client/public/index.html`.
-
-
-### Demo
-
-![Dashboard client](/screenshot/client.gif)
 
 
 # Contribution
