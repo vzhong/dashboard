@@ -9,7 +9,7 @@ Dashboard provides utilities to make and visualize experiment logs. Yes, now you
 from dashboard import reporter
 import numpy as np
 
-r = report.Reporter()
+r = reporter.Reporter()
 
 for epoch in range(10):
     for i in range(5):
