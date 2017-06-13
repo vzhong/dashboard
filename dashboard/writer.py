@@ -70,7 +70,11 @@ class FirebaseWriter(Writer):
     """
 
     def __init__(self, name, config={}, delete_existing=False):
-        import pyrebase
+        try:
+            import pyrebase
+        except Exception as e:
+            print(e)
+            raise Exception("Please install pyrebase in order to use FirebaseWriter: pip install pyrebase")
         assert name, '"name" cannot be empty!'
         fconfig = os.path.join(os.environ['HOME'], '.fb.config')
         assert os.path.isfile(fconfig), 'Failed to load config file from {}'.format(fconfig)

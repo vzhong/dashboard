@@ -1,4 +1,0 @@
-pyrebase
-ujson
-tabluate
-requests

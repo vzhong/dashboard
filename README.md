@@ -1,5 +1,7 @@
 # dashboard
 
+[![Build Status](https://travis-ci.org/vzhong/dashboard.svg?branch=master)](https://travis-ci.org/vzhong/dashboard)
+
 Dashboard provides utilities to make and visualize experiment logs. Yes, now you can run your experiments on your server and view your logs on your phone like you've always wanted.
 
 
@@ -116,5 +118,6 @@ Pull requests are welcome!
 The project is set up as follows:
 
 - `dashboard` contains the Dashboard python package, whose installation script is `setup.py`.
+- `tests` contains the unit tests for the python package, runnable via `python setup.py test`.
 - `client` contains the Firebase app.
 - `client/public` contains source code for the client, mostly written in very basic [VueJS](https://vuejs.org/).
