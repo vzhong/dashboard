@@ -22,7 +22,7 @@ class Reporter:
         """
         Empties the cache of stored metrics
         """
-        del self.log[:]
+        self.log[:] = []  # .clear is not python2 compatible
         self.keys.clear()
 
     def summary(self, ignore=('epoch', 'iteration')):
